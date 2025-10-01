@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { NeuralNetworkBackground } from "@/components/NeuralNetworkBackground";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -13,6 +14,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <TooltipProvider>
+        <NeuralNetworkBackground />
         <Toaster />
         <Sonner />
         <BrowserRouter>

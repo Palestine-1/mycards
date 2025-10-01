@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LoginForm } from "@/components/LoginForm";
+import { AnimatedLoginForm } from "@/components/AnimatedLoginForm";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { UserDashboard } from "@/components/UserDashboard";
 import { Footer } from "@/components/Footer";
@@ -76,7 +76,7 @@ const Index = () => {
   }, [sessionTimeout]);
 
   if (!isLoggedIn) {
-    return <LoginForm onLogin={handleLogin} />;
+    return <AnimatedLoginForm onLogin={handleLogin} />;
   }
 
   const renderDashboard = () => {
