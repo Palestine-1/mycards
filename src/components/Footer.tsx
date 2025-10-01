@@ -1,6 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Facebook, MessageCircle, Network, Heart } from "lucide-react";
+import { Facebook, MessageCircle, Network, Heart, Mail, Phone } from "lucide-react";
 
 export const Footer = () => {
   const handleFacebookClick = () => {
@@ -12,65 +11,69 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="mt-auto bg-gradient-to-r from-blue-600/90 to-green-600/90 text-white backdrop-blur-md">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-          {/* Logo and Title */}
-          <div className="text-center md:text-right">
-            <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-              <Network className="h-8 w-8 text-white animate-pulse" />
-              <h3 className="text-xl font-bold">نظام إدارة خطوط الإنترنت</h3>
+    <footer className="mt-auto glass-effect border-t border-white/10 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5"></div>
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+          <div className="text-center md:text-right space-y-4">
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-emerald-600 rounded-xl smooth-hover">
+                <Network className="h-7 w-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">نظام إدارة خطوط الإنترنت</h3>
             </div>
-            <p className="text-blue-100 text-sm">
-              إدارة احترافية لخطوط الإنترنت والاشتراكات الشهرية
+            <p className="text-muted-foreground text-base leading-relaxed">
+              منصة احترافية متكاملة لإدارة خطوط الإنترنت والاشتراكات الشهرية بكفاءة وسهولة
             </p>
           </div>
 
-          {/* Contact Developer */}
-          <div className="text-center">
-            <h4 className="text-lg font-semibold mb-4 flex items-center justify-center gap-2">
-              <Heart className="h-5 w-5 text-red-300 animate-pulse" />
+          <div className="text-center space-y-5">
+            <h4 className="text-xl font-bold flex items-center justify-center gap-3 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              <Heart className="h-6 w-6 text-pink-400 animate-pulse" />
               للتواصل مع المطور
             </h4>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col gap-3">
               <Button
                 onClick={handleFacebookClick}
-                variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                className="smooth-hover bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl text-white font-semibold"
               >
-                <Facebook className="h-4 w-4 ml-2" />
-                فيسبوك
+                <Facebook className="h-5 w-5 ml-2" />
+                تواصل عبر فيسبوك
               </Button>
               <Button
                 onClick={handleWhatsAppClick}
-                variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                className="smooth-hover bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 shadow-lg hover:shadow-xl text-white font-semibold"
               >
-                <MessageCircle className="h-4 w-4 ml-2" />
-                واتساب
+                <MessageCircle className="h-5 w-5 ml-2" />
+                تواصل عبر واتساب
               </Button>
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="text-center md:text-left">
-            <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-              <p className="text-sm text-blue-100 mb-2">
-                © 2025 جميع الحقوق محفوظة
-              </p>
-              <p className="text-xs text-blue-200">
-                تم التطوير بـ <Heart className="h-3 w-3 inline text-red-300" />{" "}
-                بواسطة المطور
-              </p>
+          <div className="text-center md:text-left space-y-4">
+            <div className="glass-effect rounded-xl p-5 border border-white/10 smooth-hover">
+              <h4 className="text-lg font-bold mb-3 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">معلومات التواصل</h4>
+              <div className="space-y-2 text-muted-foreground">
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <Phone className="h-4 w-4 text-blue-400" />
+                  <span className="text-sm">+201559181558</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <Mail className="h-4 w-4 text-emerald-400" />
+                  <span className="text-sm">دعم فني متاح 24/7</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Border */}
-        <div className="mt-8 pt-6 border-t border-white/20">
-          <div className="text-center">
-            <p className="text-sm text-blue-100">
-              نظام متطور لإدارة خطوط الإنترنت مع واجهة سهلة الاستخدام
+        <div className="mt-10 pt-8 border-t border-white/10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              © 2025 جميع الحقوق محفوظة - نظام إدارة خطوط الإنترنت
+            </p>
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              تم التطوير بـ <Heart className="h-4 w-4 text-pink-400 animate-pulse" /> بواسطة فريق محترف
             </p>
           </div>
         </div>

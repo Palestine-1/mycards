@@ -78,13 +78,13 @@ export const AdminDashboard = () => {
       {!showForm && !showBulkForm && !showBulkEditForm ? (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="flex justify-center">
-            <TabsList className="grid w-full max-w-2xl grid-cols-2 animate-scale-in shadow-lg bg-white/80 backdrop-blur-sm">
-              <TabsTrigger value="dashboard" className="flex items-center gap-2 transition-all duration-300 hover:scale-105">
-                <BarChart3 className="h-4 w-4" />
+            <TabsList className="grid w-full max-w-2xl grid-cols-2 animate-scale-in shadow-lg glass-effect backdrop-blur-xl h-14">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2 transition-all duration-300 smooth-hover text-base font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white">
+                <BarChart3 className="h-5 w-5" />
                 لوحة التحكم
               </TabsTrigger>
-              <TabsTrigger value="customers" className="flex items-center gap-2 transition-all duration-300 hover:scale-105">
-                <Users className="h-4 w-4" />
+              <TabsTrigger value="customers" className="flex items-center gap-2 transition-all duration-300 smooth-hover text-base font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white">
+                <Users className="h-5 w-5" />
                 العملاء
               </TabsTrigger>
             </TabsList>
@@ -121,32 +121,34 @@ export const AdminDashboard = () => {
         />
       )}
 
-      {/* Floating Action Button for Mobile */}
-      <div className="fixed bottom-6 right-6 md:hidden flex flex-col gap-2">
-        <div className="flex flex-col gap-2">
+      {!showForm && !showBulkForm && !showBulkEditForm && (
+        <div className="fixed bottom-8 left-8 flex flex-col gap-3 z-50">
           <Button
             onClick={handleBulkEdit}
             size="lg"
-            className="rounded-full h-14 w-14 shadow-lg hover-scale bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            className="rounded-full h-16 w-16 shadow-2xl smooth-hover bg-gradient-to-br from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-2 border-white/20"
+            title="تعديل جماعي"
           >
-            <Edit className="h-6 w-6" />
+            <Edit className="h-7 w-7" />
           </Button>
           <Button
             onClick={handleAddBulkCustomers}
             size="lg"
-            className="rounded-full h-14 w-14 shadow-lg hover-scale bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+            className="rounded-full h-16 w-16 shadow-2xl smooth-hover bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white border-2 border-white/20"
+            title="إضافة عدة عملاء"
           >
-            <UserPlus className="h-6 w-6" />
+            <UserPlus className="h-7 w-7" />
           </Button>
           <Button
             onClick={handleAddCustomer}
             size="lg"
-            className="rounded-full h-14 w-14 shadow-lg hover-scale animate-bounce bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+            className="rounded-full h-16 w-16 shadow-2xl smooth-hover bg-gradient-to-br from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white border-2 border-white/20 animate-pulse"
+            title="إضافة عميل واحد"
           >
-            <Plus className="h-6 w-6" />
+            <Plus className="h-7 w-7" />
           </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

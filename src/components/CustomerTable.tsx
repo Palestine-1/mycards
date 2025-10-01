@@ -571,22 +571,23 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
-                      size="icon"
+                      size="sm"
                       onClick={() => onEditCustomer(customer)}
-                      className="h-8 w-8 hover-scale"
+                      className="smooth-hover bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 shadow-md hover:shadow-lg text-white"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 ml-1" />
+                      تعديل
                     </Button>
                     <AlertDialog open={deleteCustomerId === customer.id} onOpenChange={(open) => !open && setDeleteCustomerId(null)}>
                       <AlertDialogTrigger asChild>
                         <Button
-                          variant="outline"
-                          size="icon"
+                          variant="destructive"
+                          size="sm"
                           onClick={() => setDeleteCustomerId(customer.id)}
-                          className="h-8 w-8 text-destructive hover:text-destructive hover-scale"
+                          className="smooth-hover shadow-md hover:shadow-lg"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 ml-1" />
+                          حذف
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
