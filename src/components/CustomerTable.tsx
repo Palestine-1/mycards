@@ -214,16 +214,16 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
 
   const getPaymentStatusBadge = (status: string) => {
     if (status === 'paid' || status === 'دفع') {
-      return <Badge variant="default" className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-md smooth-hover font-semibold">دفع</Badge>;
+      return <Badge variant="default" className="bg-green-500 hover:bg-green-600">دفع</Badge>;
     }
-    return <Badge variant="secondary" className="glass-effect font-semibold">لم يدفع</Badge>;
+    return <Badge variant="secondary">لم يدفع</Badge>;
   };
 
   const getRenewalStatusBadge = (status: string) => {
     if (status === 'done' || status === 'تم') {
-      return <Badge variant="default" className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 shadow-md smooth-hover font-semibold">تم التجديد</Badge>;
+      return <Badge variant="default" className="bg-blue-500 hover:bg-blue-600">تم التجديد</Badge>;
     }
-    return <Badge variant="outline" className="glass-effect font-semibold">لم يتم</Badge>;
+    return <Badge variant="outline">لم يتم</Badge>;
   };
 
   const parseDateAssume2025 = (dateString: string | null): Date | null => {
@@ -323,14 +323,14 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent tracking-tight">قائمة العملاء</h2>
-        <div className="flex gap-3">
+        <h2 className="text-2xl font-bold">قائمة العملاء</h2>
+        <div className="flex gap-2">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="smooth-hover shadow-lg hover:shadow-xl transition-all duration-300" disabled={isResetting}>
-                <RefreshCw className={`h-5 w-5 ml-2 ${isResetting ? 'animate-spin' : ''}`} />
+              <Button variant="destructive" className="hover-scale" disabled={isResetting}>
+                <RefreshCw className={`h-4 w-4 ml-2 ${isResetting ? 'animate-spin' : ''}`} />
                 إعادة تعيين الشهر
               </Button>
             </AlertDialogTrigger>
@@ -349,25 +349,25 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button onClick={onBulkEdit} variant="outline" className="smooth-hover glass-effect">
-            <Users className="h-5 w-5 ml-2" />
+          <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
+            <Users className="h-4 w-4 ml-2" />
             تعديل جماعي
           </Button>
-          <Button onClick={onAddBulkCustomers} variant="outline" className="smooth-hover glass-effect">
-            <UserPlus className="h-5 w-5 ml-2" />
+          <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale">
+            <UserPlus className="h-4 w-4 ml-2" />
             إضافة عدة عملاء
           </Button>
-          <Button onClick={onAddCustomer} className="smooth-hover bg-gradient-to-r from-blue-500 to-emerald-600 hover:from-blue-600 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300">
-            <Plus className="h-5 w-5 ml-2" />
+          <Button onClick={onAddCustomer} className="hover-scale">
+            <Plus className="h-4 w-4 ml-2" />
             إضافة عميل واحد
           </Button>
         </div>
       </div>
 
-      <div className="rounded-xl border shadow-lg overflow-hidden glass-effect backdrop-blur-xl">
+      <div className="rounded-lg border shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="glass-effect border-b border-white/10">
+            <TableRow className="bg-muted/50">
               <TableHead className="text-right">رقم العميل</TableHead>
               <TableHead className="text-right">اسم العميل</TableHead>
               <TableHead className="text-right">رقم الموبايل</TableHead>
@@ -386,15 +386,15 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
           </TableHeader>
           <TableBody>
             {customers.map((customer, index) => (
-              <TableRow
-                key={customer.id}
-                className="smooth-hover border-b border-white/5 transition-all duration-300 hover:bg-white/5 animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
+              <TableRow 
+                key={customer.id} 
+                className="hover:bg-muted/50 transition-colors animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>
                   <div className="group relative">
-                    <div className="font-bold text-lg bg-gradient-to-r from-blue-400 via-blue-500 to-emerald-400 bg-clip-text text-transparent hover:from-emerald-400 hover:via-blue-500 hover:to-blue-400 transition-all duration-500 cursor-pointer smooth-hover">
+                    <div className="font-semibold text-lg bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hover:from-green-600 hover:to-blue-600 transition-all duration-300 cursor-pointer transform hover:scale-105">
                       {customer.customer_name || 'غير محدد'}
                     </div>
                     {/* عرض الاسم المقترح تحت الاسم الأصلي */}
@@ -571,23 +571,22 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
-                      size="sm"
+                      variant="outline"
+                      size="icon"
                       onClick={() => onEditCustomer(customer)}
-                      className="smooth-hover bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 shadow-md hover:shadow-lg text-white"
+                      className="h-8 w-8 hover-scale"
                     >
-                      <Edit className="h-4 w-4 ml-1" />
-                      تعديل
+                      <Edit className="h-4 w-4" />
                     </Button>
                     <AlertDialog open={deleteCustomerId === customer.id} onOpenChange={(open) => !open && setDeleteCustomerId(null)}>
                       <AlertDialogTrigger asChild>
                         <Button
-                          variant="destructive"
-                          size="sm"
+                          variant="outline"
+                          size="icon"
                           onClick={() => setDeleteCustomerId(customer.id)}
-                          className="smooth-hover shadow-md hover:shadow-lg"
+                          className="h-8 w-8 text-destructive hover:text-destructive hover-scale"
                         >
-                          <Trash2 className="h-4 w-4 ml-1" />
-                          حذف
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>

@@ -183,15 +183,15 @@ export const Dashboard = () => {
     icon: any;
     className?: string;
   }) => (
-    <Card className={`hover-scale transition-all duration-500 glass-effect gradient-border backdrop-blur-xl ${className}`}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-base font-semibold text-muted-foreground">
+    <Card className={`hover-scale transition-all duration-300 ${className}`}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <Icon className="h-6 w-6 text-muted-foreground transition-transform duration-300 hover:scale-110" />
+        <Icon className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">{value}</div>
+        <div className="text-2xl font-bold">{value}</div>
       </CardContent>
     </Card>
   );
@@ -214,62 +214,64 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <h2 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-blue-400 via-blue-500 to-emerald-400 bg-clip-text text-transparent tracking-tight">لوحة التحكم</h2>
+    <div className="space-y-6 animate-fade-in">
+      <h2 className="text-3xl font-bold text-center mb-8">لوحة التحكم</h2>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="إجمالي العملاء"
           value={stats.totalCustomers}
           icon={Users}
-          className="animate-fade-in"
+          className="animate-fade-in bg-black/80 text-white border-gray-600"
         />
         <StatCard
           title="العملاء المدفوعون"
           value={stats.paidCustomers}
           icon={CheckCircle}
-          className="animate-fade-in"
+          className="animate-fade-in bg-black/80 text-white border-green-600"
         />
         <StatCard
           title="التجديدات المكتملة"
           value={stats.renewedCustomers}
           icon={AlertCircle}
-          className="animate-fade-in"
+          className="animate-fade-in bg-black/80 text-white border-blue-600"
         />
         <StatCard
           title="إجمالي الإيرادات"
           value={`${stats.totalRevenue.toLocaleString()} جنيه`}
           icon={DollarSign}
-          className="animate-fade-in"
+          className="animate-fade-in bg-black/80 text-white border-yellow-600"
         />
       </div>
 
-      <Card className="animate-scale-in glass-effect gradient-border backdrop-blur-xl smooth-hover">
+      {/* ملاحظات المدير */}
+      <Card className="animate-scale-in bg-black/80 text-white border-gray-600">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between cursor-pointer text-xl font-bold" onClick={() => setShowNotes(!showNotes)}>
-            <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">ملاحظات المدير ({adminNotes.length})</span>
-            {showNotes ? <ChevronUp className="h-6 w-6 transition-transform duration-300" /> : <ChevronDown className="h-6 w-6 transition-transform duration-300" />}
+          <CardTitle className="flex items-center justify-between cursor-pointer" onClick={() => setShowNotes(!showNotes)}>
+            <span>ملاحظات المدير ({adminNotes.length})</span>
+            {showNotes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </CardTitle>
         </CardHeader>
         {showNotes && (
         <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <Label htmlFor="new-note" className="text-base font-semibold">إضافة ملاحظة جديدة</Label>
-            <div className="flex gap-3">
+          {/* إضافة ملاحظة جديدة */}
+          <div className="space-y-2">
+            <Label htmlFor="new-note">إضافة ملاحظة جديدة</Label>
+            <div className="flex gap-2">
               <Textarea
                 id="new-note"
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 placeholder="اكتب ملاحظتك هنا..."
-                className="flex-1 text-right glass-effect transition-all duration-300 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="flex-1 text-right bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400"
                 rows={3}
               />
               <Button
                 onClick={addNote}
                 disabled={savingNote || !newNote.trim()}
-                className="hover-scale bg-gradient-to-r from-blue-500 to-emerald-600 hover:from-blue-600 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="hover-scale bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -379,39 +381,39 @@ export const Dashboard = () => {
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="animate-scale-in glass-effect gradient-border backdrop-blur-xl smooth-hover">
+        <Card className="animate-scale-in bg-black/80 text-white border-gray-600">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <CheckCircle className="h-6 w-6 text-emerald-400" />
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
               معدل الدفع
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
-              {stats.totalCustomers > 0
+            <div className="text-3xl font-bold text-green-600">
+              {stats.totalCustomers > 0 
                 ? Math.round((stats.paidCustomers / stats.totalCustomers) * 100)
                 : 0}%
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-gray-300">
               {stats.paidCustomers} من {stats.totalCustomers} عميل دفعوا
             </p>
           </CardContent>
         </Card>
 
-        <Card className="animate-scale-in glass-effect gradient-border backdrop-blur-xl smooth-hover">
+        <Card className="animate-scale-in bg-black/80 text-white border-gray-600">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <AlertCircle className="h-6 w-6 text-blue-400" />
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-blue-500" />
               معدل التجديد
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              {stats.totalCustomers > 0
+            <div className="text-3xl font-bold text-blue-600">
+              {stats.totalCustomers > 0 
                 ? Math.round((stats.renewedCustomers / stats.totalCustomers) * 100)
                 : 0}%
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-gray-300">
               {stats.renewedCustomers} من {stats.totalCustomers} عميل جددوا
             </p>
           </CardContent>

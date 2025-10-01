@@ -89,14 +89,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col content-overlay">
-      <div className="container mx-auto px-4 py-8 flex-1">
-        <header className="flex flex-col sm:flex-row justify-between items-center mb-12 animate-fade-in gap-4">
-          <div className="text-center sm:text-right flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-blue-500 to-emerald-400 bg-clip-text text-transparent tracking-tight">
+      <div className="container mx-auto px-4 py-8">
+        <header className="flex justify-between items-center mb-12 animate-fade-in">
+          <div className="text-center flex-1">
+            <h1 className="text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">
               نظام إدارة خطوط الإنترنت
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground">
-              {userType === "admin"
+            <p className="text-xl text-muted-foreground">
+              {userType === "admin" 
                 ? "إدارة عملاء خطوط الإنترنت والاشتراكات الشهرية بكل سهولة"
                 : userType === "multiple"
                 ? "عرض بيانات خطوطك"
@@ -106,13 +106,14 @@ const Index = () => {
           </div>
           <Button
             onClick={handleLogout}
-            className="flex items-center gap-2 smooth-hover bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 shadow-lg hover:shadow-xl text-white font-semibold"
+            variant="outline"
+            className="flex items-center gap-2 hover-scale"
           >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-4 w-4" />
             تسجيل الخروج
           </Button>
         </header>
-
+        
         {renderDashboard()}
       </div>
       <Footer />
