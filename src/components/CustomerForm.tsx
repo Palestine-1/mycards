@@ -110,9 +110,9 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
 
   return (
     <div className="animate-scale-in">
-      <Card className="max-w-2xl mx-auto shadow-lg">
+      <Card className="max-w-2xl mx-auto shadow-2xl glass-effect gradient-border backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-center text-2xl">
+          <CardTitle className="text-center text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent tracking-tight">
             {customer?.id ? 'تعديل بيانات العميل' : 'إضافة عميل جديد'}
           </CardTitle>
         </CardHeader>
@@ -120,14 +120,14 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="customer_name">اسم العميل</Label>
+                <Label htmlFor="customer_name" className="text-base font-semibold">اسم العميل</Label>
                 <Input
                   id="customer_name"
                   value={formData.customer_name}
                   onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
                   placeholder="أدخل اسم العميل"
                   required
-                  className="text-right"
+                  className="text-right h-11 transition-all duration-300 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 smooth-hover"
                 />
               </div>
 
@@ -279,12 +279,12 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
             </div>
 
             <div className="flex gap-4 justify-center pt-6">
-              <Button type="submit" disabled={loading} className="hover-scale">
-                <Save className="h-4 w-4 ml-2" />
+              <Button type="submit" disabled={loading} className="smooth-hover bg-gradient-to-r from-blue-500 to-emerald-600 hover:from-blue-600 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300 h-11 px-8 text-base font-semibold">
+                <Save className="h-5 w-5 ml-2" />
                 {loading ? 'جاري الحفظ...' : 'حفظ'}
               </Button>
-              <Button type="button" variant="outline" onClick={onCancel} className="hover-scale">
-                <X className="h-4 w-4 ml-2" />
+              <Button type="button" variant="outline" onClick={onCancel} className="smooth-hover glass-effect h-11 px-8 text-base font-semibold">
+                <X className="h-5 w-5 ml-2" />
                 إلغاء
               </Button>
             </div>
