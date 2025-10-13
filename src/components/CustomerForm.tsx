@@ -21,7 +21,7 @@ interface Customer {
   payment_status: string;
   monthly_price: number | null;
   renewal_status: string;
-  subscription_type?: string | null;
+  sub_type?: string | null;
   notes?: string | null;
 }
 
@@ -43,7 +43,7 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
     payment_status: customer?.payment_status || 'لم يدفع',
     monthly_price: customer?.monthly_price ? String(customer.monthly_price) : '',
     renewal_status: customer?.renewal_status || 'لم يتم',
-    subscription_type: customer?.subscription_type || 'شهري',
+    sub_type: customer?.sub_type || 'شهري',
     notes: customer?.notes || '',
   });
   const [loading, setLoading] = useState(false);
@@ -65,7 +65,7 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
         payment_status: formData.payment_status,
         monthly_price: formData.monthly_price ? parseFloat(formData.monthly_price) : null,
         renewal_status: formData.renewal_status,
-        subscription_type: formData.subscription_type,
+        sub_type: formData.sub_type,
         notes: formData.notes || null,
       };
 
@@ -112,16 +112,16 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
   };
 
   return (
-    <div className="animate-scale-in">
+    <div className="animate-scale-in px-3 md:px-0">
       <Card className="max-w-2xl mx-auto shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">
+        <CardHeader className="px-4 md:px-6">
+          <CardTitle className="text-center text-xl md:text-2xl">
             {customer?.id ? 'تعديل بيانات العميل' : 'إضافة عميل جديد'}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CardContent className="px-4 md:px-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="customer_name">اسم العميل</Label>
                 <Input
@@ -267,10 +267,10 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subscription_type">نوع الاشتراك</Label>
+                <Label htmlFor="sub_type">نوع الاشتراك</Label>
                 <Select
-                  value={formData.subscription_type}
-                  onValueChange={(value) => setFormData({ ...formData, subscription_type: value })}
+                  value={formData.sub_type}
+                  onValueChange={(value) => setFormData({ ...formData, sub_type: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر نوع الاشتراك" />
@@ -297,12 +297,12 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
               </div>
             </div>
 
-            <div className="flex gap-4 justify-center pt-6">
-              <Button type="submit" disabled={loading} className="hover-scale">
+            <div className="flex gap-3 md:gap-4 justify-center pt-4 md:pt-6">
+              <Button type="submit" disabled={loading} className="hover-scale flex-1 md:flex-none text-sm md:text-base">
                 <Save className="h-4 w-4 ml-2" />
                 {loading ? 'جاري الحفظ...' : 'حفظ'}
               </Button>
-              <Button type="button" variant="outline" onClick={onCancel} className="hover-scale">
+              <Button type="button" variant="outline" onClick={onCancel} className="hover-scale flex-1 md:flex-none text-sm md:text-base">
                 <X className="h-4 w-4 ml-2" />
                 إلغاء
               </Button>

@@ -56,6 +56,17 @@ export const UserDashboard = ({ userType, username }: UserDashboardProps) => {
     } else if (userType === "multiple") {
       fetchAllSuggestedNames();
     }
+
+    const subscription = supabase
+      .channel('customers_user_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, () => {
+        fetchCustomerData();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [userType, username]);
 
   const fetchSuggestedName = async () => {

@@ -24,7 +24,7 @@ interface Customer {
   payment_status: string;
   monthly_price: number | null;
   renewal_status: string;
-  subscription_type?: string | null;
+  sub_type?: string | null;
   notes: string | null;
   created_at?: string;
   updated_at?: string;
@@ -66,6 +66,17 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   useEffect(() => {
     fetchCustomers();
     fetchSuggestedNames();
+
+    const subscription = supabase
+      .channel('customers_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, () => {
+        fetchCustomers();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchCustomers = async () => {
@@ -340,8 +351,8 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
       key={customer.id}
       className="hover:bg-gray-700/50 transition-colors border-b border-gray-700"
     >
-      <TableCell className="font-medium text-white">{globalIndex}</TableCell>
-      <TableCell>
+      <TableCell className="font-medium text-white whitespace-nowrap">{globalIndex}</TableCell>
+      <TableCell className="whitespace-nowrap">
                   <div className="group relative">
                     <div className="font-semibold text-lg text-cyan-300 hover:text-cyan-200 transition-all duration-300 cursor-pointer transform hover:scale-105">
                       {customer.customer_name || 'غير محدد'}
@@ -364,9 +375,32 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                   <Badge variant="outline" className="border-cyan-500/50 text-cyan-300">{customer.line_type} جيجا</Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    {formatDate(customer.charging_date)}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      {formatDate(customer.charging_date)}
+                    </div>
+                    {(() => {
+                      const renewalInfo = getRenewalInfo(customer.charging_date, null, customer.provider);
+                      return (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-blue-300 text-xs">
+                            <Calendar className="h-3 w-3 text-blue-400" />
+                            التجديد: {renewalInfo.date}
+                          </div>
+                          {renewalInfo.status === 'warning' && (
+                            <Badge variant="outline" className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50 text-xs">
+                              متبقي {renewalInfo.daysRemaining} {renewalInfo.daysRemaining === 1 ? 'يوم' : 'يومين'}
+                            </Badge>
+                          )}
+                          {renewalInfo.status === 'overdue' && (
+                            <Badge variant="destructive" className="text-xs bg-red-900/40 text-red-300 border-red-500/50">
+                              متاح التجديد
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -397,29 +431,6 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                     <span className="text-gray-500">غير محدد</span>
                   )}
                 </TableCell>
-                <TableCell>
-                  {(() => {
-                    const renewalInfo = getRenewalInfo(customer.charging_date, null, customer.provider);
-                    return (
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-gray-300">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          {renewalInfo.date}
-                        </div>
-                        {renewalInfo.status === 'warning' && (
-                          <Badge variant="outline" className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50 text-xs">
-                            متبقي {renewalInfo.daysRemaining} {renewalInfo.daysRemaining === 1 ? 'يوم' : 'يومين'}
-                          </Badge>
-                        )}
-                        {renewalInfo.status === 'overdue' && (
-                          <Badge variant="destructive" className="text-xs bg-red-900/40 text-red-300 border-red-500/50">
-                            متاح التجديد
-                          </Badge>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </TableCell>
                 <TableCell>{getPaymentStatusBadge(customer.payment_status)}</TableCell>
                 <TableCell>
                   {customer.monthly_price ? (
@@ -433,8 +444,8 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                 </TableCell>
         <TableCell>{getRenewalStatusBadge(customer.renewal_status)}</TableCell>
         <TableCell>
-          <Badge className={getSubscriptionTypeBadgeClass(customer.subscription_type)}>
-            {getSubscriptionTypeIcon(customer.subscription_type)} {customer.subscription_type || 'شهري'}
+          <Badge className={getSubscriptionTypeBadgeClass(customer.sub_type)}>
+            {getSubscriptionTypeIcon(customer.sub_type)} {customer.sub_type || 'شهري'}
           </Badge>
         </TableCell>
         <TableCell>
@@ -568,17 +579,18 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   let globalIndex = 1;
 
   return (
-    <div className="space-y-6 animate-fade-in bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 min-h-screen p-6 rounded-lg">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-cyan-400">
+    <div className="space-y-6 animate-fade-in bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 min-h-screen p-3 md:p-6 rounded-lg">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-cyan-400">
           قائمة العملاء ({customers.length})
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="hover-scale" disabled={isResetting}>
+              <Button variant="destructive" className="hover-scale text-xs md:text-sm flex-1 md:flex-none" disabled={isResetting}>
                 <RefreshCw className={`h-4 w-4 ml-2 ${isResetting ? 'animate-spin' : ''}`} />
-                إعادة تعيين الشهر
+                <span className="hidden sm:inline">إعادة تعيين الشهر</span>
+                <span className="sm:hidden">إعادة تعيين</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -596,34 +608,37 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
+          <Button onClick={onBulkEdit} variant="outline" className="hover-scale text-xs md:text-sm flex-1 md:flex-none">
             <Users className="h-4 w-4 ml-2" />
-            تعديل جماعي
+            <span className="hidden sm:inline">تعديل جماعي</span>
+            <span className="sm:hidden">تعديل</span>
           </Button>
-          <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale">
+          <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale text-xs md:text-sm flex-1 md:flex-none">
             <UserPlus className="h-4 w-4 ml-2" />
-            إضافة عدة عملاء
+            <span className="hidden sm:inline">إضافة عدة عملاء</span>
+            <span className="sm:hidden">عدة</span>
           </Button>
-          <Button onClick={onAddCustomer} className="hover-scale bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+          <Button onClick={onAddCustomer} className="hover-scale bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-xs md:text-sm flex-1 md:flex-none">
             <Plus className="h-4 w-4 ml-2" />
-            إضافة عميل واحد
+            <span className="hidden sm:inline">إضافة عميل واحد</span>
+            <span className="sm:hidden">إضافة</span>
           </Button>
         </div>
       </div>
 
       {customers.length === 0 ? (
-        <div className="text-center py-12 animate-fade-in">
-          <div className="text-gray-400 text-lg">لا توجد بيانات عملاء</div>
-          <div className="flex gap-2 justify-center mt-4">
-            <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
+        <div className="text-center py-12 animate-fade-in px-4">
+          <div className="text-gray-400 text-base md:text-lg">لا توجد بيانات عملاء</div>
+          <div className="flex flex-wrap gap-2 justify-center mt-4">
+            <Button onClick={onBulkEdit} variant="outline" className="hover-scale text-xs md:text-sm">
               <Users className="h-4 w-4 ml-2" />
               تعديل جماعي
             </Button>
-            <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale">
+            <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale text-xs md:text-sm">
               <UserPlus className="h-4 w-4 ml-2" />
               إضافة عدة عملاء
             </Button>
-            <Button onClick={onAddCustomer} className="hover-scale">
+            <Button onClick={onAddCustomer} className="hover-scale text-xs md:text-sm">
               <Plus className="h-4 w-4 ml-2" />
               إضافة عميل واحد
             </Button>
@@ -636,46 +651,45 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
             return (
               <Card key={groupIndex} className="shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-cyan-500/30 bg-gray-800/90 backdrop-blur-sm">
                 <CardHeader
-                  className="cursor-pointer hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-700/80 transition-all rounded-t-lg"
+                  className="cursor-pointer hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-700/80 transition-all rounded-t-lg p-3 md:p-6"
                   onClick={() => toggleGroup(group.groupName)}
                 >
                   <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-lg">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-bold text-sm md:text-lg shadow-lg">
                         {group.count}
                       </div>
-                      <span className="text-xl font-bold text-cyan-400">
+                      <span className="text-base md:text-xl font-bold text-cyan-400">
                         {group.groupName}
                       </span>
                     </div>
                     {isExpanded ? (
-                      <ChevronUp className="h-6 w-6 text-cyan-400" />
+                      <ChevronUp className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
                     ) : (
-                      <ChevronDown className="h-6 w-6 text-cyan-400" />
+                      <ChevronDown className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
                     )}
                   </CardTitle>
                 </CardHeader>
                 {isExpanded && (
                   <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                      <Table>
+                    <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-700">
+                      <Table className="min-w-[1200px]">
                         <TableHeader>
                           <TableRow className="bg-gradient-to-r from-gray-700 to-gray-700 border-b-2 border-cyan-500/50">
-                            <TableHead className="text-right font-bold text-cyan-400">#</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">اسم العميل</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">رقم الموبايل</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">نوع الخط</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">تاريخ الشحن</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">وقت الوصول</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">مزود الخدمة</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">ملكية الخط</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">تاريخ التجديد</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">حالة الدفع</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">السعر الشهري</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">حالة التجديد</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">نوع الاشتراك</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">ملاحظات</TableHead>
-                            <TableHead className="text-right font-bold text-cyan-400">الإجراءات</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">#</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">اسم العميل</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">رقم الموبايل</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">نوع الخط</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">تاريخ الشحن والتجديد</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">وقت الوصول</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">مزود الخدمة</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">ملكية الخط</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">حالة الدفع</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">السعر الشهري</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">حالة التجديد</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">نوع الاشتراك</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">ملاحظات</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400 whitespace-nowrap">الإجراءات</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>

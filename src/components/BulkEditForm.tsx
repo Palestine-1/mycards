@@ -44,6 +44,7 @@ export const BulkEditForm = ({ onSave, onCancel }: BulkEditFormProps) => {
     payment_status: "no-change",
     monthly_price: "",
     renewal_status: "no-change",
+    sub_type: "no-change",
   });
   const { toast } = useToast();
 
@@ -118,6 +119,7 @@ export const BulkEditForm = ({ onSave, onCancel }: BulkEditFormProps) => {
       if (editData.payment_status && editData.payment_status !== "no-change") updateData.payment_status = editData.payment_status;
       if (editData.monthly_price) updateData.monthly_price = parseFloat(editData.monthly_price);
       if (editData.renewal_status && editData.renewal_status !== "no-change") updateData.renewal_status = editData.renewal_status;
+      if (editData.sub_type && editData.sub_type !== "no-change") updateData.sub_type = editData.sub_type;
 
       if (Object.keys(updateData).length === 0) {
         toast({
@@ -163,18 +165,18 @@ export const BulkEditForm = ({ onSave, onCancel }: BulkEditFormProps) => {
   }
 
   return (
-    <div className="animate-scale-in">
+    <div className="animate-scale-in px-3 md:px-0">
       <Card className="max-w-6xl mx-auto shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl flex items-center justify-center gap-2">
-            <Users className="h-6 w-6" />
+        <CardHeader className="px-4 md:px-6">
+          <CardTitle className="text-center text-xl md:text-2xl flex items-center justify-center gap-2">
+            <Users className="h-5 w-5 md:h-6 md:w-6" />
             تعديل جماعي للعملاء
           </CardTitle>
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm md:text-base text-muted-foreground">
             اختر العملاء المراد تعديل بياناتهم
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 md:px-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Search */}
             <div className="space-y-2">
@@ -347,8 +349,8 @@ export const BulkEditForm = ({ onSave, onCancel }: BulkEditFormProps) => {
 
                   <div className="space-y-2">
                     <Label htmlFor="renewal_status">حالة التجديد</Label>
-                    <Select 
-                      value={editData.renewal_status} 
+                    <Select
+                      value={editData.renewal_status}
                       onValueChange={(value) => setEditData({ ...editData, renewal_status: value })}
                     >
                       <SelectTrigger>
@@ -358,6 +360,23 @@ export const BulkEditForm = ({ onSave, onCancel }: BulkEditFormProps) => {
                         <SelectItem value="no-change">لا تغيير</SelectItem>
                         <SelectItem value="تم">تم التجديد</SelectItem>
                         <SelectItem value="لم يتم">لم يتم التجديد</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="sub_type">نوع الاشتراك</Label>
+                    <Select
+                      value={editData.sub_type}
+                      onValueChange={(value) => setEditData({ ...editData, sub_type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر نوع الاشتراك" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no-change">لا تغيير</SelectItem>
+                        <SelectItem value="شهري">شهري</SelectItem>
+                        <SelectItem value="مدفوع كامل">مدفوع كامل</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

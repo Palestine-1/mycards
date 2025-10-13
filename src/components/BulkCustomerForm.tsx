@@ -20,6 +20,7 @@ interface CustomerData {
   payment_status: string;
   monthly_price: string;
   renewal_status: string;
+  sub_type: string;
 }
 
 interface BulkCustomerFormProps {
@@ -40,6 +41,7 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
       payment_status: 'لم يدفع',
       monthly_price: '',
       renewal_status: 'لم يتم',
+      sub_type: 'شهري',
     }
   ]);
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,7 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
         payment_status: 'لم يدفع',
         monthly_price: '',
         renewal_status: 'لم يتم',
+        sub_type: 'شهري',
       }]);
     }
   };
@@ -106,6 +109,7 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
         payment_status: customer.payment_status,
         monthly_price: customer.monthly_price ? parseFloat(customer.monthly_price) : null,
         renewal_status: customer.renewal_status,
+        sub_type: customer.sub_type,
       }));
 
       console.log('Data to insert:', dataToInsert);
@@ -147,6 +151,7 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
         payment_status: 'دفع',
         monthly_price: '150',
         renewal_status: 'تم',
+        sub_type: 'شهري',
       },
       {
         customer_name: 'فاطمة علي',
@@ -159,6 +164,7 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
         payment_status: 'لم يدفع',
         monthly_price: '200',
         renewal_status: 'لم يتم',
+        sub_type: 'مدفوع كامل',
       },
       {
         customer_name: 'محمود حسن',
@@ -171,24 +177,25 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
         payment_status: 'دفع',
         monthly_price: '175',
         renewal_status: 'تم',
+        sub_type: 'شهري',
       }
     ];
     setCustomers(sampleCustomers);
   };
 
   return (
-    <div className="animate-scale-in">
+    <div className="animate-scale-in px-3 md:px-0">
       <Card className="max-w-6xl mx-auto shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl flex items-center justify-center gap-2">
-            <Users className="h-6 w-6" />
+        <CardHeader className="px-4 md:px-6">
+          <CardTitle className="text-center text-xl md:text-2xl flex items-center justify-center gap-2">
+            <Users className="h-5 w-5 md:h-6 md:w-6" />
             إضافة عدة عملاء
           </CardTitle>
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm md:text-base text-muted-foreground">
             يمكنك إضافة حتى 20 عميل في المرة الواحدة
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 md:px-6">
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="manual">إدخال يدوي</TabsTrigger>
@@ -360,8 +367,8 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
 
                         <div className="space-y-2">
                           <Label htmlFor={`renewal_status_${index}`}>حالة التجديد</Label>
-                          <Select 
-                            value={customer.renewal_status} 
+                          <Select
+                            value={customer.renewal_status}
                             onValueChange={(value) => updateCustomer(index, 'renewal_status', value)}
                           >
                             <SelectTrigger>
@@ -370,6 +377,22 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
                             <SelectContent>
                               <SelectItem value="تم">تم التجديد</SelectItem>
                               <SelectItem value="لم يتم">لم يتم التجديد</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`sub_type_${index}`}>نوع الاشتراك</Label>
+                          <Select
+                            value={customer.sub_type}
+                            onValueChange={(value) => updateCustomer(index, 'sub_type', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر نوع الاشتراك" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="شهري">شهري</SelectItem>
+                              <SelectItem value="مدفوع كامل">مدفوع كامل</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -498,8 +521,8 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
 
                           <div className="space-y-2">
                             <Label htmlFor={`renewal_status_${index}`}>حالة التجديد</Label>
-                            <Select 
-                              value={customer.renewal_status} 
+                            <Select
+                              value={customer.renewal_status}
                               onValueChange={(value) => updateCustomer(index, 'renewal_status', value)}
                             >
                               <SelectTrigger>
@@ -508,6 +531,22 @@ export const BulkCustomerForm = ({ onSave, onCancel }: BulkCustomerFormProps) =>
                               <SelectContent>
                                 <SelectItem value="تم">تم التجديد</SelectItem>
                                 <SelectItem value="لم يتم">لم يتم التجديد</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor={`sub_type_${index}`}>نوع الاشتراك</Label>
+                            <Select
+                              value={customer.sub_type}
+                              onValueChange={(value) => updateCustomer(index, 'sub_type', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="اختر نوع الاشتراك" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="شهري">شهري</SelectItem>
+                                <SelectItem value="مدفوع كامل">مدفوع كامل</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
