@@ -338,64 +338,63 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   const renderCustomerRow = (customer: Customer, globalIndex: number) => (
     <TableRow
       key={customer.id}
-      className="hover:bg-muted/50 transition-colors"
+      className="hover:bg-gray-700/50 transition-colors border-b border-gray-700"
     >
-      <TableCell className="font-medium">{globalIndex}</TableCell>
+      <TableCell className="font-medium text-white">{globalIndex}</TableCell>
       <TableCell>
                   <div className="group relative">
-                    <div className="font-semibold text-lg bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hover:from-green-600 hover:to-blue-600 transition-all duration-300 cursor-pointer transform hover:scale-105">
+                    <div className="font-semibold text-lg text-cyan-300 hover:text-cyan-200 transition-all duration-300 cursor-pointer transform hover:scale-105">
                       {customer.customer_name || 'غير محدد'}
                     </div>
-                    {/* عرض الاسم المقترح تحت الاسم الأصلي */}
                     {getSuggestedName(customer.mobile_number) && (
-                      <div className="text-xs text-blue-500 mt-1 font-medium">
+                      <div className="text-xs text-blue-400 mt-1 font-medium">
                         الاسم المقترح: {getSuggestedName(customer.mobile_number)}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-green-600 group-hover:w-full transition-all duration-300"></div>
+                    <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 group-hover:w-full transition-all duration-300"></div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <Phone className="h-4 w-4 text-gray-400" />
                     {String(customer.mobile_number)}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{customer.line_type} جيجا</Badge>
+                  <Badge variant="outline" className="border-cyan-500/50 text-cyan-300">{customer.line_type} جيجا</Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <Calendar className="h-4 w-4 text-gray-400" />
                     {formatDate(customer.charging_date)}
                   </div>
                 </TableCell>
                 <TableCell>
                   {customer.arrival_time ? (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <Calendar className="h-4 w-4 text-gray-400" />
                       {formatDate(customer.arrival_time)}
                     </div>
                   ) : (
-                    'غير محدد'
+                    <span className="text-gray-500">غير محدد</span>
                   )}
                 </TableCell>
                 <TableCell>
                   {customer.provider ? (
-                    <Badge variant="outline" className="capitalize">
+                    <Badge variant="outline" className="capitalize border-blue-500/50 text-blue-300">
                       {customer.provider}
                     </Badge>
                   ) : (
-                    'غير محدد'
+                    <span className="text-gray-500">غير محدد</span>
                   )}
                 </TableCell>
                 <TableCell>
                   {customer.ownership ? (
-                    <Badge variant="secondary" className="capitalize">
+                    <Badge variant="secondary" className="capitalize bg-gray-700 text-gray-300">
                       {customer.ownership}
                     </Badge>
                   ) : (
-                    'غير محدد'
+                    <span className="text-gray-500">غير محدد</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -403,17 +402,17 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                     const renewalInfo = getRenewalInfo(customer.charging_date, null, customer.provider);
                     return (
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <Calendar className="h-4 w-4 text-gray-400" />
                           {renewalInfo.date}
                         </div>
                         {renewalInfo.status === 'warning' && (
-                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
+                          <Badge variant="outline" className="bg-yellow-900/40 text-yellow-300 border-yellow-500/50 text-xs">
                             متبقي {renewalInfo.daysRemaining} {renewalInfo.daysRemaining === 1 ? 'يوم' : 'يومين'}
                           </Badge>
                         )}
                         {renewalInfo.status === 'overdue' && (
-                          <Badge variant="destructive" className="text-xs">
+                          <Badge variant="destructive" className="text-xs bg-red-900/40 text-red-300 border-red-500/50">
                             متاح التجديد
                           </Badge>
                         )}
@@ -424,12 +423,12 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                 <TableCell>{getPaymentStatusBadge(customer.payment_status)}</TableCell>
                 <TableCell>
                   {customer.monthly_price ? (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <DollarSign className="h-4 w-4 text-gray-400" />
                       {customer.monthly_price} جنيه
                     </div>
                   ) : (
-                    'غير محدد'
+                    <span className="text-gray-500">غير محدد</span>
                   )}
                 </TableCell>
         <TableCell>{getRenewalStatusBadge(customer.renewal_status)}</TableCell>
@@ -569,9 +568,9 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   let globalIndex = 1;
 
   return (
-    <div className="space-y-6 animate-fade-in bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 min-h-screen p-6 rounded-lg">
+    <div className="space-y-6 animate-fade-in bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 min-h-screen p-6 rounded-lg">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold text-cyan-400">
           قائمة العملاء ({customers.length})
         </h2>
         <div className="flex gap-2">
@@ -614,7 +613,7 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
 
       {customers.length === 0 ? (
         <div className="text-center py-12 animate-fade-in">
-          <div className="text-muted-foreground text-lg">لا توجد بيانات عملاء</div>
+          <div className="text-gray-400 text-lg">لا توجد بيانات عملاء</div>
           <div className="flex gap-2 justify-center mt-4">
             <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
               <Users className="h-4 w-4 ml-2" />
@@ -635,24 +634,24 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
           {customerGroups.map((group, groupIndex) => {
             const isExpanded = expandedGroups[group.groupName] ?? true;
             return (
-              <Card key={groupIndex} className="shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-blue-100 bg-white/80 backdrop-blur-sm">
+              <Card key={groupIndex} className="shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-cyan-500/30 bg-gray-800/90 backdrop-blur-sm">
                 <CardHeader
-                  className="cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all rounded-t-lg"
+                  className="cursor-pointer hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-700/80 transition-all rounded-t-lg"
                   onClick={() => toggleGroup(group.groupName)}
                 >
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-lg">
+                      <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-lg">
                         {group.count}
                       </div>
-                      <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                      <span className="text-xl font-bold text-cyan-400">
                         {group.groupName}
                       </span>
                     </div>
                     {isExpanded ? (
-                      <ChevronUp className="h-6 w-6 text-blue-600" />
+                      <ChevronUp className="h-6 w-6 text-cyan-400" />
                     ) : (
-                      <ChevronDown className="h-6 w-6 text-blue-600" />
+                      <ChevronDown className="h-6 w-6 text-cyan-400" />
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -661,22 +660,22 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b-2 border-blue-200">
-                            <TableHead className="text-right font-bold">#</TableHead>
-                            <TableHead className="text-right font-bold">اسم العميل</TableHead>
-                            <TableHead className="text-right font-bold">رقم الموبايل</TableHead>
-                            <TableHead className="text-right font-bold">نوع الخط</TableHead>
-                            <TableHead className="text-right font-bold">تاريخ الشحن</TableHead>
-                            <TableHead className="text-right font-bold">وقت الوصول</TableHead>
-                            <TableHead className="text-right font-bold">مزود الخدمة</TableHead>
-                            <TableHead className="text-right font-bold">ملكية الخط</TableHead>
-                            <TableHead className="text-right font-bold">تاريخ التجديد</TableHead>
-                            <TableHead className="text-right font-bold">حالة الدفع</TableHead>
-                            <TableHead className="text-right font-bold">السعر الشهري</TableHead>
-                            <TableHead className="text-right font-bold">حالة التجديد</TableHead>
-                            <TableHead className="text-right font-bold">نوع الاشتراك</TableHead>
-                            <TableHead className="text-right font-bold">ملاحظات</TableHead>
-                            <TableHead className="text-right font-bold">الإجراءات</TableHead>
+                          <TableRow className="bg-gradient-to-r from-gray-700 to-gray-700 border-b-2 border-cyan-500/50">
+                            <TableHead className="text-right font-bold text-cyan-400">#</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">اسم العميل</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">رقم الموبايل</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">نوع الخط</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">تاريخ الشحن</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">وقت الوصول</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">مزود الخدمة</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">ملكية الخط</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">تاريخ التجديد</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">حالة الدفع</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">السعر الشهري</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">حالة التجديد</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">نوع الاشتراك</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">ملاحظات</TableHead>
+                            <TableHead className="text-right font-bold text-cyan-400">الإجراءات</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
