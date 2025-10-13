@@ -21,6 +21,7 @@ interface Customer {
   payment_status: string;
   monthly_price: number | null;
   renewal_status: string;
+  subscription_type?: string | null;
   notes?: string | null;
 }
 
@@ -42,6 +43,7 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
     payment_status: customer?.payment_status || 'لم يدفع',
     monthly_price: customer?.monthly_price ? String(customer.monthly_price) : '',
     renewal_status: customer?.renewal_status || 'لم يتم',
+    subscription_type: customer?.subscription_type || 'شهري',
     notes: customer?.notes || '',
   });
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,7 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
         payment_status: formData.payment_status,
         monthly_price: formData.monthly_price ? parseFloat(formData.monthly_price) : null,
         renewal_status: formData.renewal_status,
+        subscription_type: formData.subscription_type,
         notes: formData.notes || null,
       };
 
@@ -247,10 +250,10 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
                 />
               </div>
 
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="renewal_status">حالة التجديد</Label>
-                <Select 
-                  value={formData.renewal_status} 
+                <Select
+                  value={formData.renewal_status}
                   onValueChange={(value) => setFormData({ ...formData, renewal_status: value })}
                 >
                   <SelectTrigger>
@@ -259,6 +262,22 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
                   <SelectContent>
                     <SelectItem value="تم">تم التجديد</SelectItem>
                     <SelectItem value="لم يتم">لم يتم التجديد</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="subscription_type">نوع الاشتراك</Label>
+                <Select
+                  value={formData.subscription_type}
+                  onValueChange={(value) => setFormData({ ...formData, subscription_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر نوع الاشتراك" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="شهري">شهري</SelectItem>
+                    <SelectItem value="مدفوع كامل">مدفوع كامل</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -3,12 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, CreditCard as Edit, Trash2, Phone, Calendar, DollarSign, UserPlus, StickyNote, Users, RefreshCw } from "lucide-react";
+import { Plus, CreditCard as Edit, Trash2, Phone, Calendar, DollarSign, UserPlus, StickyNote, Users, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { groupCustomersByName, getSubscriptionTypeBadgeClass, getSubscriptionTypeIcon } from "@/utils/customerGrouping";
 
 interface Customer {
   id: number;
@@ -22,6 +24,7 @@ interface Customer {
   payment_status: string;
   monthly_price: number | null;
   renewal_status: string;
+  subscription_type?: string | null;
   notes: string | null;
   created_at?: string;
   updated_at?: string;
@@ -50,7 +53,15 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   const [deleteCustomerId, setDeleteCustomerId] = useState<number | null>(null);
   const [deleteNoteCustomerId, setDeleteNoteCustomerId] = useState<number | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<{ [key: string]: boolean }>({});
   const { toast } = useToast();
+
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
 
   useEffect(() => {
     fetchCustomers();
@@ -322,77 +333,15 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
     );
   }
 
-  return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">قائمة العملاء</h2>
-        <div className="flex gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="hover-scale" disabled={isResetting}>
-                <RefreshCw className={`h-4 w-4 ml-2 ${isResetting ? 'animate-spin' : ''}`} />
-                إعادة تعيين الشهر
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
-                <AlertDialogDescription className="text-right">
-                  سيتم إعادة تعيين السعر الشهري وحالة الدفع وحالة التجديد لجميع العملاء. هذا الإجراء سيؤثر على جميع السجلات.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                <AlertDialogAction onClick={resetMonthlyPrices} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  تأكيد
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
-            <Users className="h-4 w-4 ml-2" />
-            تعديل جماعي
-          </Button>
-          <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale">
-            <UserPlus className="h-4 w-4 ml-2" />
-            إضافة عدة عملاء
-          </Button>
-          <Button onClick={onAddCustomer} className="hover-scale">
-            <Plus className="h-4 w-4 ml-2" />
-            إضافة عميل واحد
-          </Button>
-        </div>
-      </div>
+  const customerGroups = groupCustomersByName(customers);
 
-      <div className="rounded-lg border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="text-right">رقم العميل</TableHead>
-              <TableHead className="text-right">اسم العميل</TableHead>
-              <TableHead className="text-right">رقم الموبايل</TableHead>
-              <TableHead className="text-right">نوع الخط</TableHead>
-              <TableHead className="text-right">تاريخ الشحن</TableHead>
-              <TableHead className="text-right">وقت الوصول</TableHead>
-              <TableHead className="text-right">مزود الخدمة</TableHead>
-              <TableHead className="text-right">ملكية الخط</TableHead>
-              <TableHead className="text-right">تاريخ التجديد</TableHead>
-              <TableHead className="text-right">حالة الدفع</TableHead>
-              <TableHead className="text-right">السعر الشهري</TableHead>
-              <TableHead className="text-right">حالة التجديد</TableHead>
-              <TableHead className="text-right">ملاحظات</TableHead>
-              <TableHead className="text-right">الإجراءات</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customers.map((customer, index) => (
-              <TableRow 
-                key={customer.id} 
-                className="hover:bg-muted/50 transition-colors animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>
+  const renderCustomerRow = (customer: Customer, globalIndex: number) => (
+    <TableRow
+      key={customer.id}
+      className="hover:bg-muted/50 transition-colors"
+    >
+      <TableCell className="font-medium">{globalIndex}</TableCell>
+      <TableCell>
                   <div className="group relative">
                     <div className="font-semibold text-lg bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent hover:from-green-600 hover:to-blue-600 transition-all duration-300 cursor-pointer transform hover:scale-105">
                       {customer.customer_name || 'غير محدد'}
@@ -483,8 +432,13 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                     'غير محدد'
                   )}
                 </TableCell>
-                <TableCell>{getRenewalStatusBadge(customer.renewal_status)}</TableCell>
-                <TableCell>
+        <TableCell>{getRenewalStatusBadge(customer.renewal_status)}</TableCell>
+        <TableCell>
+          <Badge className={getSubscriptionTypeBadgeClass(customer.subscription_type)}>
+            {getSubscriptionTypeIcon(customer.subscription_type)} {customer.subscription_type || 'شهري'}
+          </Badge>
+        </TableCell>
+        <TableCell>
                   <Dialog open={noteDialogOpen && editingNote?.id === customer.id} onOpenChange={setNoteDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
@@ -608,14 +562,57 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        </TableCell>
+    </TableRow>
+  );
+
+  let globalIndex = 1;
+
+  return (
+    <div className="space-y-6 animate-fade-in bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 min-h-screen p-6 rounded-lg">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          قائمة العملاء ({customers.length})
+        </h2>
+        <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="hover-scale" disabled={isResetting}>
+                <RefreshCw className={`h-4 w-4 ml-2 ${isResetting ? 'animate-spin' : ''}`} />
+                إعادة تعيين الشهر
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                <AlertDialogDescription className="text-right">
+                  سيتم إعادة تعيين السعر الشهري وحالة الدفع وحالة التجديد لجميع العملاء. هذا الإجراء سيؤثر على جميع السجلات.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogAction onClick={resetMonthlyPrices} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  تأكيد
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button onClick={onBulkEdit} variant="outline" className="hover-scale">
+            <Users className="h-4 w-4 ml-2" />
+            تعديل جماعي
+          </Button>
+          <Button onClick={onAddBulkCustomers} variant="outline" className="hover-scale">
+            <UserPlus className="h-4 w-4 ml-2" />
+            إضافة عدة عملاء
+          </Button>
+          <Button onClick={onAddCustomer} className="hover-scale bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+            <Plus className="h-4 w-4 ml-2" />
+            إضافة عميل واحد
+          </Button>
+        </div>
       </div>
 
-      {customers.length === 0 && (
+      {customers.length === 0 ? (
         <div className="text-center py-12 animate-fade-in">
           <div className="text-muted-foreground text-lg">لا توجد بيانات عملاء</div>
           <div className="flex gap-2 justify-center mt-4">
@@ -632,6 +629,70 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
               إضافة عميل واحد
             </Button>
           </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {customerGroups.map((group, groupIndex) => {
+            const isExpanded = expandedGroups[group.groupName] ?? true;
+            return (
+              <Card key={groupIndex} className="shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-blue-100 bg-white/80 backdrop-blur-sm">
+                <CardHeader
+                  className="cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all rounded-t-lg"
+                  onClick={() => toggleGroup(group.groupName)}
+                >
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-lg">
+                        {group.count}
+                      </div>
+                      <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                        {group.groupName}
+                      </span>
+                    </div>
+                    {isExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-blue-600" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-blue-600" />
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                {isExpanded && (
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b-2 border-blue-200">
+                            <TableHead className="text-right font-bold">#</TableHead>
+                            <TableHead className="text-right font-bold">اسم العميل</TableHead>
+                            <TableHead className="text-right font-bold">رقم الموبايل</TableHead>
+                            <TableHead className="text-right font-bold">نوع الخط</TableHead>
+                            <TableHead className="text-right font-bold">تاريخ الشحن</TableHead>
+                            <TableHead className="text-right font-bold">وقت الوصول</TableHead>
+                            <TableHead className="text-right font-bold">مزود الخدمة</TableHead>
+                            <TableHead className="text-right font-bold">ملكية الخط</TableHead>
+                            <TableHead className="text-right font-bold">تاريخ التجديد</TableHead>
+                            <TableHead className="text-right font-bold">حالة الدفع</TableHead>
+                            <TableHead className="text-right font-bold">السعر الشهري</TableHead>
+                            <TableHead className="text-right font-bold">حالة التجديد</TableHead>
+                            <TableHead className="text-right font-bold">نوع الاشتراك</TableHead>
+                            <TableHead className="text-right font-bold">ملاحظات</TableHead>
+                            <TableHead className="text-right font-bold">الإجراءات</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {group.customers.map((customer) => {
+                            const row = renderCustomerRow(customer, globalIndex);
+                            globalIndex++;
+                            return row;
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
