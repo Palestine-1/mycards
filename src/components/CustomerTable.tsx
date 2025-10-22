@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, CreditCard as Edit, Trash2, Phone, Calendar, DollarSign, UserPlus, StickyNote, Users, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, CreditCard as Edit, Trash2, Phone, Calendar, DollarSign, UserPlus, StickyNote, Users, RefreshCw, ChevronDown, ChevronUp, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,6 +54,8 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   const [deleteNoteCustomerId, setDeleteNoteCustomerId] = useState<number | null>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<{ [key: string]: boolean }>({});
+  const [editingGroupName, setEditingGroupName] = useState<{ groupName: string; suggested: string } | null>(null);
+  const [groupNameDialogOpen, setGroupNameDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const toggleGroup = (groupName: string) => {
@@ -118,6 +120,40 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
   const getSuggestedName = (mobileNumber: number): string | null => {
     const suggested = suggestedNames.find(s => s.mobile_number === String(mobileNumber));
     return suggested ? suggested.suggested_name : null;
+  };
+
+  const updateGroupSuggestedName = async (groupName: string, suggestedName: string) => {
+    try {
+      const groupCustomers = customers.filter(c => c.customer_name === groupName);
+
+      for (const customer of groupCustomers) {
+        await supabase
+          .from('suggested_names')
+          .upsert({
+            mobile_number: String(customer.mobile_number),
+            suggested_name: suggestedName,
+          }, {
+            onConflict: 'mobile_number'
+          });
+      }
+
+      await fetchSuggestedNames();
+
+      toast({
+        title: "تم بنجاح",
+        description: `تم حفظ النظام المقترح "${suggestedName}" لجميع عملاء ${groupName}`,
+      });
+
+      setEditingGroupName(null);
+      setGroupNameDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating group suggested name:', error);
+      toast({
+        title: "خطأ",
+        description: `فشل في حفظ النظام المقترح: ${error.message}`,
+        variant: "destructive",
+      });
+    }
   };
   const deleteCustomer = async (id: number) => {
     try {
@@ -650,12 +686,12 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
             const isExpanded = expandedGroups[group.groupName] ?? true;
             return (
               <Card key={groupIndex} className="shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-cyan-500/30 bg-gray-800/90 backdrop-blur-sm">
-                <CardHeader
-                  className="cursor-pointer hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-700/80 transition-all rounded-t-lg p-3 md:p-6"
-                  onClick={() => toggleGroup(group.groupName)}
-                >
+                <CardHeader className="p-3 md:p-6">
                   <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 md:gap-3">
+                    <div
+                      className="flex items-center gap-2 md:gap-3 cursor-pointer flex-1"
+                      onClick={() => toggleGroup(group.groupName)}
+                    >
                       <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center font-bold text-sm md:text-lg shadow-lg">
                         {group.count}
                       </div>
@@ -663,11 +699,79 @@ export const CustomerTable = ({ onAddCustomer, onAddBulkCustomers, onBulkEdit, o
                         {group.groupName}
                       </span>
                     </div>
-                    {isExpanded ? (
-                      <ChevronUp className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Dialog open={groupNameDialogOpen && editingGroupName?.groupName === group.groupName} onOpenChange={setGroupNameDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const existingSuggested = getSuggestedName(group.customers[0].mobile_number) || '';
+                              setEditingGroupName({ groupName: group.groupName, suggested: existingSuggested });
+                              setGroupNameDialogOpen(true);
+                            }}
+                            className="flex items-center gap-2 hover:bg-blue-900/50 transition-colors text-xs md:text-sm"
+                          >
+                            <Tag className="h-4 w-4" />
+                            <span className="hidden md:inline">نظام مقترح</span>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>إضافة نظام مقترح لمجموعة: {group.groupName}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">النظام المقترح</label>
+                              <Input
+                                value={editingGroupName?.suggested || ''}
+                                onChange={(e) => setEditingGroupName(prev =>
+                                  prev ? { ...prev, suggested: e.target.value } : null
+                                )}
+                                placeholder="أدخل النظام المقترح..."
+                                className="text-right"
+                              />
+                              <p className="text-xs text-gray-400">
+                                سيتم تطبيق هذا النظام على جميع العملاء في المجموعة ({group.count} عميل)
+                              </p>
+                            </div>
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingGroupName(null);
+                                  setGroupNameDialogOpen(false);
+                                }}
+                              >
+                                إلغاء
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  if (editingGroupName) {
+                                    updateGroupSuggestedName(editingGroupName.groupName, editingGroupName.suggested);
+                                  }
+                                }}
+                              >
+                                حفظ
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleGroup(group.groupName)}
+                        className="p-2"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 md:h-6 md:w-6 text-cyan-400" />
+                        )}
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 {isExpanded && (
