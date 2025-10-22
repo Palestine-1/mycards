@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,28 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
     renewal_status: customer?.renewal_status || 'لم يتم',
     sub_type: customer?.sub_type || 'شهري',
     notes: customer?.notes || '',
+    suggested_name: '',
   });
+
+  const [existingSuggestedName, setExistingSuggestedName] = useState<string>('');
+
+  useEffect(() => {
+    if (customer?.mobile_number) {
+      const fetchSuggestedName = async () => {
+        const { data } = await supabase
+          .from('suggested_names')
+          .select('suggested_name')
+          .eq('mobile_number', String(customer.mobile_number))
+          .maybeSingle();
+
+        if (data) {
+          setExistingSuggestedName(data.suggested_name);
+          setFormData(prev => ({ ...prev, suggested_name: data.suggested_name }));
+        }
+      };
+      fetchSuggestedName();
+    }
+  }, [customer?.mobile_number]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -69,10 +90,9 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
         notes: formData.notes || null,
       };
 
-      console.log('Data to save:', dataToSave); // للتأكد من البيانات
+      console.log('Data to save:', dataToSave);
 
       if (customer?.id) {
-        // Update existing customer
         const { error } = await supabase
           .from('customers')
           .update(dataToSave)
@@ -85,7 +105,6 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
           description: "تم تحديث بيانات العميل بنجاح",
         });
       } else {
-        // Create new customer
         const { error } = await supabase
           .from('customers')
           .insert([dataToSave]);
@@ -96,6 +115,21 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
           title: "تم بنجاح",
           description: "تم إضافة العميل الجديد بنجاح",
         });
+      }
+
+      if (formData.suggested_name && formData.mobile_number) {
+        const { error: suggestedNameError } = await supabase
+          .from('suggested_names')
+          .upsert({
+            mobile_number: String(formData.mobile_number),
+            suggested_name: formData.suggested_name,
+          }, {
+            onConflict: 'mobile_number'
+          });
+
+        if (suggestedNameError) {
+          console.error('Error saving suggested name:', suggestedNameError);
+        }
       }
 
       onSave();
@@ -132,6 +166,22 @@ export const CustomerForm = ({ customer, onSave, onCancel }: CustomerFormProps) 
                   required
                   className="text-right"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="suggested_name">النظام المقترح (اختياري)</Label>
+                <Input
+                  id="suggested_name"
+                  value={formData.suggested_name}
+                  onChange={(e) => setFormData({ ...formData, suggested_name: e.target.value })}
+                  placeholder="أدخل النظام المقترح"
+                  className="text-right"
+                />
+                {existingSuggestedName && (
+                  <p className="text-xs text-blue-500 mt-1">
+                    النظام الحالي: {existingSuggestedName}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
